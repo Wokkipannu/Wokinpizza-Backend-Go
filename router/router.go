@@ -22,6 +22,9 @@ func SetupRoutes(app *fiber.App) {
 	api.Delete("/pizza", handler.DeletePizza)
 
 	// Daily topping routes
-	api.Get("/dailytoppings", handler.GetToppings)
-	api.Put("/dailytoppings", handler.UpdateToppings)
+	api.Get("/dailytoppings", handler.GetDailyToppings)
+	api.Put("/dailytoppings", handler.UpdateDailyToppings)
+
+	// Topping routes
+	api.Get("/toppings", handler.GetToppings)
 }
