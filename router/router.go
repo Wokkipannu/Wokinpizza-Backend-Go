@@ -27,4 +27,5 @@ func SetupRoutes(app *fiber.App) {
 
 	// Topping routes
 	api.Get("/toppings", handler.GetToppings)
+	api.Get("/random", handler.GetRandomToppings)
 }

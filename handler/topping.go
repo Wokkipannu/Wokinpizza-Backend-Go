@@ -1,7 +1,12 @@
 package handler
 
 import (
+	"fmt"
 	"log"
+	"math/rand"
+	"strconv"
+	"strings"
+	"time"
 	"wp-backend/models"
 
 	"github.com/gofiber/fiber/v2"
@@ -19,9 +24,53 @@ func GetToppings(c *fiber.Ctx) error {
 	err := mgm.Coll(&models.Topping{}).SimpleFind(&toppings, bson.D{})
 	if err != nil {
 		log.Printf("Failed to fetch toppings")
-		return c.JSON(fiber.Map{"status": "error", "message": "Error fetching  toppings"})
+		return c.JSON(fiber.Map{"status": "error", "message": "Error fetching toppings"})
 	}
 	return c.JSON(fiber.Map{"status": "success", "message": "Toppings", "data": toppings})
+}
+
+func GetRandomToppings(c *fiber.Ctx) error {
+	var amount int64
+	if c.Params("amount") != "" {
+		a, parseErr := strconv.ParseInt(c.Params("amount"), 10, 64)
+		if parseErr != nil {
+			return c.JSON(fiber.Map{"status": "error", "message": "Invalid amount"})
+		}
+		amount = a
+	} else if c.Query("amount") != "" {
+		a, parseErr := strconv.ParseInt(c.Query("amount"), 10, 64)
+		if parseErr != nil {
+			return c.JSON(fiber.Map{"status": "error", "message": "Invalid amount"})
+		}
+		amount = a
+	} else {
+		amount = 4
+	}
+
+	rand.Seed(time.Now().UnixNano())
+
+	toppings := []models.Topping{}
+
+	err := mgm.Coll(&models.Topping{}).SimpleFind(&toppings, bson.D{})
+	if err != nil {
+		log.Printf("Failed to fetch toppings")
+		return c.JSON(fiber.Map{"status": "error", "message": "Error fetching toppings"})
+	}
+
+	randomToppings := make(map[string]int)
+	for i := int64(0); i < amount; i++ {
+		randomToppings[toppings[rand.Intn(len(toppings))].Topping] += 1
+	}
+	var output []string
+	for k, v := range randomToppings {
+		if v > 1 {
+			output = append(output, fmt.Sprintf("%vx %v", v, k))
+		} else {
+			output = append(output, k)
+		}
+	}
+
+	return c.JSON(fiber.Map{"status": "success", "message": "Random pizza fetched", "data": strings.Join(output[:], ", ")})
 }
 
 func GetDailyToppings(c *fiber.Ctx) error {
