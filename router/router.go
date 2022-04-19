@@ -17,9 +17,9 @@ func SetupRoutes(app *fiber.App) {
 	// Pizza routes
 	api.Get("/pizza", handler.GetAllPizza)
 	api.Get("/pizza/:id", handler.GetPizza)
-	api.Post("/pizza", handler.NewPizza)
-	api.Put("/pizza", handler.UpdatePizza)
-	api.Delete("/pizza", handler.DeletePizza)
+	api.Post("/pizza", handler.AuthLevelAdmin, handler.NewPizza)
+	api.Put("/pizza", handler.AuthLevelAdmin, handler.UpdatePizza)
+	api.Delete("/pizza", handler.AuthLevelAdmin, handler.DeletePizza)
 
 	// Daily topping routes
 	api.Get("/dailytoppings", handler.GetDailyToppings)
@@ -28,4 +28,13 @@ func SetupRoutes(app *fiber.App) {
 	// Topping routes
 	api.Get("/toppings", handler.GetToppings)
 	api.Get("/random", handler.GetRandomToppings)
+
+	// Auth
+	api.Get("/auth/login", handler.Login)
+	api.Get("/auth/logout", handler.Logout)
+	api.Get("/auth/callback", handler.Callback)
+	api.Get("/auth/user", handler.GetUser)
+
+	// Test routes
+	api.Get("/auth/admin", handler.AuthLevelAdmin, func(c *fiber.Ctx) error { return c.SendStatus(fiber.StatusOK) })
 }

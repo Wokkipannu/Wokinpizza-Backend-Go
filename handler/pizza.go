@@ -24,10 +24,10 @@ func GetAllPizza(c *fiber.Ctx) error {
 	err := mgm.Coll(&models.Pizza{}).SimpleFind(&result, bson.D{})
 	if err != nil {
 		log.Printf("Error finding all pizzas")
-		return c.JSON(fiber.Map{"status": "error", "message": "Error fetching pizzas"})
+		return c.Status(500).JSON(fiber.Map{"message": "Error fetching pizzas"})
 	}
 
-	return c.JSON(fiber.Map{"status": "success", "message": "All pizzas", "data": result})
+	return c.JSON(fiber.Map{"message": "All pizzas", "data": result})
 }
 
 func GetPizza(c *fiber.Ctx) error {
@@ -39,10 +39,10 @@ func GetPizza(c *fiber.Ctx) error {
 	err := coll.FindByID(id, pizza)
 	if err != nil {
 		log.Printf("Error finding pizza by id: %v", id)
-		return c.JSON(fiber.Map{"status": "error", "message": "Error fetching pizza by id"})
+		return c.Status(404).JSON(fiber.Map{"message": "Error fetching pizza by id"})
 	}
 
-	return c.JSON(fiber.Map{"status": "success", "message": "Pizza", "data": pizza})
+	return c.JSON(fiber.Map{"message": "Pizza", "data": pizza})
 }
 
 func NewPizza(c *fiber.Ctx) error {
@@ -63,10 +63,10 @@ func NewPizza(c *fiber.Ctx) error {
 	err := mgm.Coll(pizza).Create(pizza)
 	if err != nil {
 		log.Printf("Error creating a pizza")
-		return c.JSON(fiber.Map{"status": "error", "message": "Error creating a new pizza"})
+		return c.Status(500).JSON(fiber.Map{"message": "Error creating a new pizza"})
 	}
 
-	return c.JSON(fiber.Map{"status": "success", "message": "New pizza", "data": pizza})
+	return c.JSON(fiber.Map{"message": "New pizza", "data": pizza})
 }
 
 func DeletePizza(c *fiber.Ctx) error {
@@ -78,16 +78,16 @@ func DeletePizza(c *fiber.Ctx) error {
 	err := coll.FindByID(id, pizza)
 	if err != nil {
 		log.Printf("Error finding pizza by id: %v", id)
-		return c.JSON(fiber.Map{"status": "error", "message": "Error fetching pizza by id"})
+		return c.Status(404).JSON(fiber.Map{"message": "Error fetching pizza by id"})
 	}
 
 	err2 := mgm.Coll(pizza).Delete(pizza)
 	if err2 != nil {
 		log.Printf("Error deleting pizza by id: %v", id)
-		return c.JSON(fiber.Map{"status": "error", "message": "Error deleting pizza by id"})
+		return c.Status(500).JSON(fiber.Map{"message": "Error deleting pizza by id"})
 	}
 
-	return c.JSON(fiber.Map{"status": "success", "message": "Pizza deleted"})
+	return c.JSON(fiber.Map{"message": "Pizza deleted"})
 }
 
 func UpdatePizza(c *fiber.Ctx) error {
@@ -103,7 +103,7 @@ func UpdatePizza(c *fiber.Ctx) error {
 	err := coll.FindByID(p.ID, pizza)
 	if err != nil {
 		log.Printf("Error finding pizza by id: %v", p.ID)
-		return c.JSON(fiber.Map{"status": "error", "message": "Error fetching pizza by id"})
+		return c.Status(404).JSON(fiber.Map{"message": "Error fetching pizza by id"})
 	}
 
 	pizza.Name = p.Name
@@ -115,8 +115,8 @@ func UpdatePizza(c *fiber.Ctx) error {
 	err2 := mgm.Coll(pizza).Update(pizza)
 	if err2 != nil {
 		log.Printf("Error updating pizza with id: %v", p.ID)
-		return c.JSON(fiber.Map{"status": "error", "message": "Error updating pizza"})
+		return c.Status(500).JSON(fiber.Map{"message": "Error updating pizza"})
 	}
 
-	return c.JSON(fiber.Map{"status": "success", "message": "Pizza updated", "data": pizza})
+	return c.JSON(fiber.Map{"message": "Pizza updated", "data": pizza})
 }

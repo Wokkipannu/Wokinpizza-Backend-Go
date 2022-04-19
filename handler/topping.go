@@ -24,9 +24,9 @@ func GetToppings(c *fiber.Ctx) error {
 	err := mgm.Coll(&models.Topping{}).SimpleFind(&toppings, bson.D{})
 	if err != nil {
 		log.Printf("Failed to fetch toppings")
-		return c.JSON(fiber.Map{"status": "error", "message": "Error fetching toppings"})
+		return c.Status(500).JSON(fiber.Map{"message": "Error fetching toppings"})
 	}
-	return c.JSON(fiber.Map{"status": "success", "message": "Toppings", "data": toppings})
+	return c.JSON(fiber.Map{"message": "Toppings", "data": toppings})
 }
 
 func GetRandomToppings(c *fiber.Ctx) error {
@@ -34,13 +34,13 @@ func GetRandomToppings(c *fiber.Ctx) error {
 	if c.Params("amount") != "" {
 		a, parseErr := strconv.ParseInt(c.Params("amount"), 10, 64)
 		if parseErr != nil {
-			return c.JSON(fiber.Map{"status": "error", "message": "Invalid amount"})
+			return c.Status(400).JSON(fiber.Map{"message": "Invalid amount"})
 		}
 		amount = a
 	} else if c.Query("amount") != "" {
 		a, parseErr := strconv.ParseInt(c.Query("amount"), 10, 64)
 		if parseErr != nil {
-			return c.JSON(fiber.Map{"status": "error", "message": "Invalid amount"})
+			return c.Status(400).JSON(fiber.Map{"message": "Invalid amount"})
 		}
 		amount = a
 	} else {
@@ -54,7 +54,7 @@ func GetRandomToppings(c *fiber.Ctx) error {
 	err := mgm.Coll(&models.Topping{}).SimpleFind(&toppings, bson.D{})
 	if err != nil {
 		log.Printf("Failed to fetch toppings")
-		return c.JSON(fiber.Map{"status": "error", "message": "Error fetching toppings"})
+		return c.Status(500).JSON(fiber.Map{"message": "Error fetching toppings"})
 	}
 
 	randomToppings := make(map[string]int)
@@ -70,7 +70,7 @@ func GetRandomToppings(c *fiber.Ctx) error {
 		}
 	}
 
-	return c.JSON(fiber.Map{"status": "success", "message": "Random pizza fetched", "data": strings.Join(output[:], ", ")})
+	return c.JSON(fiber.Map{"message": "Random pizza fetched", "data": strings.Join(output[:], ", ")})
 }
 
 func GetDailyToppings(c *fiber.Ctx) error {
@@ -80,10 +80,10 @@ func GetDailyToppings(c *fiber.Ctx) error {
 	err := coll.First(bson.M{}, toppings)
 	if err != nil {
 		log.Printf("Failed to fetch daily toppings")
-		return c.JSON(fiber.Map{"status": "error", "message": "Error fetching daily toppings"})
+		return c.Status(500).JSON(fiber.Map{"message": "Error fetching daily toppings"})
 	}
 
-	return c.JSON(fiber.Map{"status": "success", "message": "Daily toppings", "data": toppings})
+	return c.JSON(fiber.Map{"message": "Daily toppings", "data": toppings})
 }
 
 func UpdateDailyToppings(c *fiber.Ctx) error {
@@ -95,15 +95,15 @@ func UpdateDailyToppings(c *fiber.Ctx) error {
 	err := coll.First(bson.M{}, toppings)
 	if err != nil {
 		log.Printf("Failed to fetch daily toppings")
-		return c.JSON(fiber.Map{"status": "error", "message": "Error fetching daily toppings"})
+		return c.Status(500).JSON(fiber.Map{"message": "Error fetching daily toppings"})
 	}
 
 	toppings.Toppings = t.Toppings
 	err2 := mgm.Coll(toppings).Update(toppings)
 	if err2 != nil {
 		log.Printf("Failed to update daily toppings")
-		return c.JSON(fiber.Map{"status": "error", "message": "Error updating daily toppings"})
+		return c.Status(500).JSON(fiber.Map{"message": "Error updating daily toppings"})
 	}
 
-	return c.JSON(fiber.Map{"status": "success", "message": "Daily toppings updated", "data": toppings})
+	return c.JSON(fiber.Map{"message": "Daily toppings updated", "data": toppings})
 }
