@@ -88,7 +88,8 @@ func Callback(c *fiber.Ctx) error {
 	cookie.Expires = time.Now().Add(time.Hour * 72)
 
 	c.Cookie(cookie)
-	return c.JSON(fiber.Map{"message": "Login success"})
+	return c.Redirect("/login")
+	// return c.JSON(fiber.Map{"message": "Login success"})
 }
 
 func Login(c *fiber.Ctx) error {
