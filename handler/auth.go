@@ -48,14 +48,14 @@ func Callback(c *fiber.Ctx) error {
 	token, err := conf.Exchange(context.Background(), c.Query("code"))
 	if err != nil {
 		log.Printf("Error when authenticating with discord")
-		return c.JSON(fiber.Map{"status": "error", "message": "Error when authenticating with discord"})
+		return c.Status(500).JSON(fiber.Map{"message": "Error when authenticating with discord"})
 	}
 
 	// Get user info
 	res, err := conf.Client(context.Background(), token).Get("https://discord.com/api/users/@me")
 	if err != nil {
 		log.Printf("Error when fetching user data from discord")
-		return c.JSON(fiber.Map{"status": "error", "message": "Error when fetching user data from discord"})
+		return c.Status(500).JSON(fiber.Map{"message": "Error when fetching user data from discord"})
 	}
 	defer res.Body.Close()
 
@@ -88,7 +88,7 @@ func Callback(c *fiber.Ctx) error {
 	cookie.Expires = time.Now().Add(time.Hour * 72)
 
 	c.Cookie(cookie)
-	return c.JSON(fiber.Map{"status": "success", "message": "Login success"})
+	return c.JSON(fiber.Map{"message": "Login success"})
 }
 
 func Login(c *fiber.Ctx) error {
@@ -114,7 +114,7 @@ func GetUser(c *fiber.Ctx) error {
 
 	claims, err := ValidateToken(cookie)
 	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"status": "error", "message": "Token validation error"})
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"message": "Token validation error"})
 	}
 
 	return c.JSON(fiber.Map{"message": "User valid", "data": claims})
