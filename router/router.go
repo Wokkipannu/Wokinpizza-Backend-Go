@@ -27,6 +27,9 @@ func SetupRoutes(app *fiber.App) {
 
 	// Topping routes
 	api.Get("/toppings", handler.GetToppings)
+	api.Post("/topping", handler.AuthLevelAdmin, handler.NewTopping)
+	api.Put("/topping", handler.AuthLevelAdmin, handler.UpdateTopping)
+	api.Delete("/topping", handler.AuthLevelAdmin, handler.DeleteTopping)
 	api.Get("/random", handler.GetRandomToppings)
 
 	// Auth
