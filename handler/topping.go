@@ -3,6 +3,7 @@ package handler
 import (
 	"fmt"
 	"log"
+	"math"
 	"math/rand"
 	"strconv"
 	"strings"
@@ -21,6 +22,11 @@ type Dailytopping struct {
 type Topping struct {
 	ID      string `json:"id,omitempty" xml:"id,omitempty" form:"id,omitempty"`
 	Topping string `json:"topping" xml:"topping" form:"topping"`
+}
+
+type ToppingResponse struct {
+	Text  string
+	Count int64
 }
 
 func GetToppings(c *fiber.Ctx) error {
@@ -130,16 +136,25 @@ func GetRandomToppings(c *fiber.Ctx) error {
 		return c.Status(500).JSON(fiber.Map{"message": "Error fetching toppings"})
 	}
 
-	randomToppings := make(map[string]int)
-	for i := int64(0); i < amount; i++ {
-		randomToppings[toppings[rand.Intn(len(toppings))].Topping] += 1
+	randomToppings := make([]ToppingResponse, len(toppings))
+	for amount > 0 {
+		randIndex := rand.Intn(len(toppings))
+		countLimit := math.Ceil(float64(amount) / 12)
+		count := rand.Int63n(int64(countLimit))
+		if count == 0 {
+			count += 1
+		}
+		randomToppings[randIndex].Count += count
+		randomToppings[randIndex].Text = toppings[randIndex].Topping
+		amount -= count
 	}
+
 	var output []string
-	for k, v := range randomToppings {
-		if v > 1 {
-			output = append(output, fmt.Sprintf("%vx %v", v, k))
-		} else {
-			output = append(output, k)
+	for _, v := range randomToppings {
+		if v.Count > 1 {
+			output = append(output, fmt.Sprintf("%vx %v", v.Count, v.Text))
+		} else if v.Count == 1 {
+			output = append(output, v.Text)
 		}
 	}
 
